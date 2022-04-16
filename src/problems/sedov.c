@@ -3,6 +3,19 @@
 #include <gsl/gsl_sort_vector.h>
 #include <gsl/gsl_vector.h>
 
+// Units: kpc, Msun, km/s
+// Dims:  2D/3D
+// Ref:   Hu et al. (2014)
+
+#ifndef TWO_DIM
+    int NNpart = 64;
+#else
+    int NNpart = 16;
+#endif
+const float Unit_Mass_in_g = 1.989e33;
+const float Unit_Velocity_in_cms = 1.0e5;
+
+const float  Supernova_Energy = 6.78e53 / (Unit_Mass_in_g * Unit_Velocity_in_cms * Unit_Velocity_in_cms); // Total injection energy 
 
 void setup_Sedov_Blast()
 {
@@ -11,6 +24,11 @@ void setup_Sedov_Blast()
     Problem.Boxsize[2] = 3;
 
     sprintf ( Problem.Name, "IC_SedovBlast" );
+
+    printf("UnitMass_in_g:        %.3e\n", Unit_Mass_in_g);
+    printf("UnitVelocity_in_cm/s: %.3e\n", Unit_Velocity_in_cms);
+    printf("Supernova_Energy:     %.3e\n", Supernova_Energy);
+    printf("NNpart:               %d\n", NNpart);
 
     const double rho = 1.24E7;
 
@@ -30,15 +48,19 @@ float Sedov_Blast_Density ( const int ipart , const double bias )
 
 float Sedov_Blast_abs ()
 {
-
-    int NNpart = 296;
-
     gsl_vector *abs_of_zero = gsl_vector_alloc ( Param.Npart );
 
     for ( int i = 0; i < Param.Npart; i++ ) {
 
-        double r = sqrt ( ( P[i].Pos[0] - 0.5 * Problem.Boxsize[0] ) * ( P[i].Pos[0] - 0.5 * Problem.Boxsize[0] ) + ( P[i].Pos[1] * 0.5 * Problem.Boxsize[1] ) * ( P[i].Pos[1] - 0.5 * Problem.Boxsize[1] )
-                          + ( P[i].Pos[2] - 0.5 * Problem.Boxsize[2] ) * ( P[i].Pos[2] - 0.5 * Problem.Boxsize[2] ) );
+        double x = P[i].Pos[0] - 0.5 * Problem.Boxsize[0];
+        double y = P[i].Pos[1] - 0.5 * Problem.Boxsize[1];
+#ifndef TWO_DIM
+        double z = P[i].Pos[2] - 0.5 * Problem.Boxsize[2];
+#else
+        double z = 0.0;
+#endif
+
+        double r = sqrt (x*x + y*y + z*z);
         gsl_vector_set ( abs_of_zero, i, r );
     }
 
@@ -83,7 +105,12 @@ float Sedov_Blast_kinetic ()
 
 float Sedov_Blast_U ( const int ipart )
 {
-    return 0.0;
+    float AmbientTemperature = 10.0;
+    float HydrogenMass_in_g  = 1.67e-24;
+    float Boltzmann_in_cgs   = 1.38e-16;
+    float gamma              = 5.0/3.0;
+    float u_in_cms2          = (Boltzmann_in_cgs * AmbientTemperature) / (HydrogenMass_in_g * (gamma - 1.0));
+    return u_in_cms2 / Unit_Velocity_in_cms / Unit_Velocity_in_cms;
 }
 
 
@@ -97,19 +124,37 @@ void Sedov_Blast_PostProcessing ()
 
     float maxDistance = Sedov_Blast_abs ();
 
-    for ( int ipart = 0; ipart < Param.Npart; ++ipart ) {
+    int count_inj = 0;
 
-
+    for ( int ipart = 0; ipart < Param.Npart; ipart++ ) {
         const double x = P[ipart].Pos[0] - Problem.Boxsize[0] * 0.5;
         const double y = P[ipart].Pos[1] - Problem.Boxsize[1] * 0.5;
+#ifndef TWO_DIM
         const double z = P[ipart].Pos[2] - Problem.Boxsize[2] * 0.5;
         double Radius = sqrt ( x * x + y * y + z * z );
-        // int NNpart = 32;
-        const double  Supernova_Energy = 0.00502765; // This is the value of one supernova energy per unit mass in Gadget units 1e51 erg
-        // const double hsml = SphP[i].Hsml;
-
+#else
+        double Radius = sqrt ( x * x + y * y );
+#endif
         if ( Radius <=  maxDistance ) {
-            SphP[ipart].U = Supernova_Energy;
+            // SphP[ipart].U = Supernova_Energy / (double) NNpart / Problem.Mpart;
+            count_inj++;
+        }
+    }
+
+    printf(" inject energy to %d particles... ", count_inj);
+    
+    for ( int ipart = 0; ipart < Param.Npart; ipart++ ) {
+        const double x = P[ipart].Pos[0] - Problem.Boxsize[0] * 0.5;
+        const double y = P[ipart].Pos[1] - Problem.Boxsize[1] * 0.5;
+#ifndef TWO_DIM
+        const double z = P[ipart].Pos[2] - Problem.Boxsize[2] * 0.5;
+        double Radius = sqrt ( x * x + y * y + z * z );
+#else
+        double Radius = sqrt ( x * x + y * y );
+#endif
+        if ( Radius <=  maxDistance ) {
+            SphP[ipart].U = Supernova_Energy / (float) count_inj / Problem.Mpart;
+            // printf("U %.3e, m %.3e\n", Supernova_Energy / (float) count_inj / Problem.Mpart, Problem.Mpart);
         }
     }
 

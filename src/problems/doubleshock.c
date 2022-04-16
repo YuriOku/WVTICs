@@ -1,5 +1,10 @@
 #include "../globals.h"
 
+/* Standard Gadget units */
+const double ULength = 3.08568025e21; 	// kpc in cgs
+const double UMass = 1.989e43;			// 10^10 Msol in cgs
+const double UVel = 1e5;					// km/s in cgs
+
 static float XBoxhalf;
 static float Rho[3] = { 0 }, U[3] = { 0 }, Velx[3] = { 0 };
 
@@ -151,7 +156,7 @@ float Double_Shock_U ( const int ipart )
     return u;
 }
 
-void Double_Shock_Velocity ( const int ipart, float vel[3] )
+void Double_Shock_Velocity ( const int ipart, double vel[3] )
 {
     const float x = P[ipart].Pos[0];
 

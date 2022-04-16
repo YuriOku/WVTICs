@@ -29,7 +29,7 @@ struct Block_Info {
 } Block;
 
 // Gadget-2 expects specific block order
-#ifdef SPH_CUBIC_SPLINE
+#if defined(SPH_CUBIC_SPLINE) || defined(GADGET2_OUTPUT_ORDER)
 enum iofields {
     IO_POS,
     IO_VEL,

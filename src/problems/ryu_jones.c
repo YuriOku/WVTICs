@@ -53,7 +53,7 @@ float Ryu_Jones_Density ( const int ipart , const double bias )
     }
 }
 
-void Ryu_Jones_Velocity ( const int ipart, float out[3] )
+void Ryu_Jones_Velocity ( const int ipart, double out[3] )
 {
     if ( isOnLeft ( ipart ) ) {
         out[0] = RJ95.left_vx;

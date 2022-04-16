@@ -34,7 +34,7 @@ float User_U ( const int ipart )
     return 1.0f;
 }
 
-void User_Velocity ( const int ipart, float out[3] )
+void User_Velocity ( const int ipart, double out[3] )
 {
     out[0] = out[1] = out[2] = 0;
 }

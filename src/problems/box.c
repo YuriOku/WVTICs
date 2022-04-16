@@ -41,7 +41,7 @@ float Box_Density ( const int ipart , const double bias )
 /* The next step is setting up the velocity profile for the Box, following for example Hopkins 2015 or Hu 2014 */
 
 
-void Box_Velocity ( const int ipart, float out[3] )
+void Box_Velocity ( const int ipart, double out[3] )
 {
     out[0] = 142.3;
     out[1] = -31.3;

@@ -24,7 +24,7 @@ float Orszag_Tang_Vortex_Density ( const int ipart , const double bias)
     return 25.0 / ( 36.0 * pi );
 }
 
-void Orszag_Tang_Vortex_Velocity ( const int ipart, float out[3] )
+void Orszag_Tang_Vortex_Velocity ( const int ipart, double out[3] )
 {
 
     double const x = P[ipart].Pos[0] / Problem.Boxsize[0];

@@ -50,7 +50,7 @@ float GalaxyCluster_Density ( const int ipart , const double bias )
     return betamodel ( r );
 }
 
-void GalaxyCluster_Velocity ( const int ipart, float out[3] )
+void GalaxyCluster_Velocity ( const int ipart, double out[3] )
 {
     out[0] = 0.0;
     out[1] = 0.0;

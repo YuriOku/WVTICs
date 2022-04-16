@@ -35,7 +35,7 @@ float Linear_Alfven_Wave_Density ( const int ipart , const double bias )
 }
 
 
-void Linear_Alfven_Wave_Velocity ( const int ipart, float out[3] )
+void Linear_Alfven_Wave_Velocity ( const int ipart, double out[3] )
 {
     out[0] = out[1] = out[2] = 0.0;
 

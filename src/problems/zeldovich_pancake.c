@@ -39,7 +39,7 @@ float Zeldovich_Pancake_Density ( const int ipart , const double bias )
     return rho / ( 1 - ( 1 + redshift_crit ) / ( 1 + redshift_start ) * cos ( k * q_of_x ( ipart ) ) );
 }
 
-void Zeldovich_Pancake_Velocity ( const int ipart, float out[3] )
+void Zeldovich_Pancake_Velocity ( const int ipart, double out[3] )
 {
     const double redshift_start = 100.0;
     const double redshift_crit = 1.0;

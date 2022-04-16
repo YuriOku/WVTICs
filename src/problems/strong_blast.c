@@ -29,7 +29,7 @@ float Strong_Blast_Density ( const int ipart , const double bias )
     return 1.0;
 }
 
-void Strong_Blast_Velocity ( const int ipart, float out[3] )
+void Strong_Blast_Velocity ( const int ipart, double out[3] )
 {
     out[0] = out[1] = out[2] = 0.0;
 

@@ -46,7 +46,7 @@ float Keplerian_Ring_U ( const int ipart )
 
 }
 
-void Keplerian_Ring_Velocity ( const int ipart, float out[3] )
+void Keplerian_Ring_Velocity ( const int ipart, double out[3] )
 {
 
     out[0] = 0.0;

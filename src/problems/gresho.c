@@ -35,7 +35,7 @@ float Gresho_Vortex_Phi ( const int ipart )
 /* The next step is setting up the velocity profile for the Vortex, following for example Hopkins 2015 or Hu 2014 */
 /* It is just the easy case with Machnumber of 1, the more difficult is done later */
 
-void Gresho_Vortex_Velocity ( const int ipart, float out[3] )
+void Gresho_Vortex_Velocity ( const int ipart, double out[3] )
 {
     double x = P[ipart].Pos[0] - Problem.Boxsize[0] * 0.5;
     double y = P[ipart].Pos[1] - Problem.Boxsize[1] * 0.5;

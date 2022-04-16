@@ -42,7 +42,7 @@ float Rayleigh_Taylor_Instability_Density ( const int ipart , const double bias 
 }
 
 
-void Rayleigh_Taylor_Instability_Velocity ( const int ipart, float out[3] )
+void Rayleigh_Taylor_Instability_Velocity ( const int ipart, double out[3] )
 {
     float x = P[ipart].Pos[0] / Problem.Boxsize[0];
     float y = P[ipart].Pos[1] / Problem.Boxsize[1];

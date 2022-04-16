@@ -41,7 +41,7 @@ float Kelvin_Helmholtz_Instability_U ( const int ipart )
     return 101527.0;
 }
 
-void Kelvin_Helmholtz_Instability_Velocity ( const int ipart, float out[3] )
+void Kelvin_Helmholtz_Instability_Velocity ( const int ipart, double out[3] )
 {
     if ( isOuterLayer ( ipart ) ) {
         out[0] = 40.0;

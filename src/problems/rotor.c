@@ -36,7 +36,7 @@ float Rotor_Density ( const int ipart , const double bias )
     }
 }
 
-void Rotor_Velocity ( const int ipart, float out[3] )
+void Rotor_Velocity ( const int ipart, double out[3] )
 {
 
     double const x = P[ipart].Pos[0] - Problem.Boxsize[0] * 0.5;
