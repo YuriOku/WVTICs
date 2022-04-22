@@ -163,9 +163,16 @@ void fill_write_buffer ( enum iofields blocknr, void *wbuf,
 
     switch ( blocknr ) {
     case IO_POS:
+#ifndef TWO_DIM
         for ( i = 0; i < 3; i++ ) {
             ( ( float * ) wbuf ) [ibuf + i] = (float) P[ipart].Pos[i];
         }
+#else
+        for ( i = 0; i < 2; i++ ) {
+            ( ( float * ) wbuf ) [ibuf + i] = (float) P[ipart].Pos[i];
+        }
+        ( ( float * ) wbuf ) [ibuf + 2] = 0.0;
+#endif
         break;
     case IO_VEL:
         for ( i = 0; i < 3; i++ ) {
