@@ -1,61 +1,69 @@
 #include "../globals.h"
 
-void setup_Kelvin_Helmholtz_Instability()
-{
-    Problem.Boxsize[0] = 256;
-    Problem.Boxsize[1] = 256;
-    Problem.Boxsize[2] = 16;
+// This file sets up the IC for Kelvin Helmholtz intstability test as defined by
+// McNally et al (2012).
 
-    sprintf ( Problem.Name, "IC_KelvinHelmholtz" );
+void setup_Kelvin_Helmholtz_Instability() {
+  Problem.Boxsize[0] = 1.;
+  Problem.Boxsize[1] = 1.;
+  Problem.Boxsize[2] = 0.25;
 
-    Problem.Rho_Max = 6.26E-8;
+  sprintf(Problem.Name, "IC_KelvinHelmholtz_000");
 
-    Density_Func_Ptr = &Kelvin_Helmholtz_Instability_Density;
-    U_Func_Ptr = &Kelvin_Helmholtz_Instability_U;
-    Velocity_Func_Ptr = &Kelvin_Helmholtz_Instability_Velocity;
+  Problem.Rho_Max = 2.0;
+
+  Density_Func_Ptr = &Kelvin_Helmholtz_Instability_Density;
+  U_Func_Ptr = &Kelvin_Helmholtz_Instability_U;
+  Velocity_Func_Ptr = &Kelvin_Helmholtz_Instability_Velocity;
 }
 
-bool isOuterLayer ( const int ipart )
-{
-    const double y = P[ipart].Pos[1];
-    const double frac = y / Problem.Boxsize[1];
-
-    if ( frac <= 1.0 / 3.0 || frac > 2.0 / 3.0 ) {
-        return true;
-    } else {
-        return false;
-    }
+float Kelvin_Helmholtz_Instability_Density(const int ipart, const double bias) {
+  double rho1 = 1.0;
+  double rho2 = 2.0;
+  double rhom = 0.5 * (rho1 - rho2);
+  double Lsmooth = 0.025;
+  double y = P[ipart].Pos[1] / Problem.Boxsize[1];
+  if (y < 0.25) {
+    return rho1 - rhom * exp((y - 0.25) / Lsmooth);
+    // return rho1;
+  } else if (y < 0.5) {
+    return rho2 + rhom * exp((-y + 0.25) / Lsmooth);
+    // return rho2;
+  } else if (y < 0.75) {
+    return rho2 + rhom * exp((y - 0.75) / Lsmooth);
+    // return rho2;
+  } else {
+    return rho1 - rhom * exp((-y + 0.75) / Lsmooth);
+    // return rho1;
+  }
 }
 
-float Kelvin_Helmholtz_Instability_Density ( const int ipart , const double bias)
-{
-    if ( isOuterLayer ( ipart ) ) {
-        return 3.13E-8;
-    } else {
-        return 6.26E-8;
-    }
+float Kelvin_Helmholtz_Instability_U(const int ipart) {
+  double pressure = 2.5;
+  double rho = Kelvin_Helmholtz_Instability_Density(ipart, 0.0);
+  double gamma = 5.0 / 3;
+  return pressure / rho * (gamma - 1);
 }
 
-float Kelvin_Helmholtz_Instability_U ( const int ipart )
-{
-    return 101527.0;
-}
+void Kelvin_Helmholtz_Instability_Velocity(const int ipart, double out[3]) {
+  double v1 = 0.5;
+  double v2 = -0.5;
+  double vm = 0.5 * (v1 - v2);
+  double Lsmooth = 0.025;
+  double y = P[ipart].Pos[1] / Problem.Boxsize[1];
+  if (y < 0.25) {
+    out[0] = v1 - vm * exp((y - 0.25) / Lsmooth);
+  } else if (y < 0.5) {
+    out[0] = v2 + vm * exp((-y + 0.25) / Lsmooth);
+  } else if (y < 0.75) {
+    out[0] = v2 + vm * exp((y - 0.75) / Lsmooth);
+  } else {
+    out[0] = v1 - vm * exp((-y + 0.75) / Lsmooth);
+  }
 
-void Kelvin_Helmholtz_Instability_Velocity ( const int ipart, double out[3] )
-{
-    if ( isOuterLayer ( ipart ) ) {
-        out[0] = 40.0;
-    } else {
-        out[0] = -40.0;
-    }
+  const double deltaVy = 0.01;
+  double x = P[ipart].Pos[0] / Problem.Boxsize[0];
+  out[1] = deltaVy * sin(4.0 * M_PI * x);
 
-    const double deltaVy = 4.0;
-    const double lambda = 128.0;
-    const double x = P[ipart].Pos[0];
-    const double y = P[ipart].Pos[1];
-
-    out[1] = deltaVy * ( sin ( 2.0 * pi * ( x + lambda / 2.0 ) / lambda ) * exp ( -pow ( 10.0 * ( y - 64.0 ), 2.0 ) )
-                         - sin ( 2.0 * pi * x / lambda ) * exp ( -pow ( 10.0 * ( y + 64.0 ), 2.0 ) ) );
-
-    out[2] = 0.0;
+  out[2] = 0.0;
 }
