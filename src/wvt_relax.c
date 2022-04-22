@@ -151,7 +151,7 @@ void Regularise_sph_particles()
         #pragma omp parallel for shared(delta, hsml, P) schedule(dynamic, nPart/Omp.NThreads/256)
         for ( int ipart = 0; ipart < nPart; ipart++ ) {
 
-            delta[0][ipart] = delta[1][ipart] = delta[2][ipart] = 0;
+            delta[0][ipart] = delta[1][ipart] = delta[2][ipart] = 0.0;
 
             int ngblist[NGBMAX] = { 0 };
             int ngbcnt = Find_ngb ( ipart, hsml[ipart], ngblist );
@@ -201,12 +201,30 @@ void Regularise_sph_particles()
 #else
                 double kernel_fac = p3 ( h );
 #endif
-                float wk = sph_kernel ( r, h ) * kernel_fac;
-
-                delta[0][ipart] += step * h * wk * d[0] / r;
-                delta[1][ipart] += step * h * wk * d[1] / r;
+#ifdef USE_APM
+                if (it <= Param.LastMoveStep) {
+                  double PI_i = max(1.0 + 0.1*relativeDensityErrorWithSign(ipart), 0.1);
+                  double PI_j = max(1.0 + 0.1*relativeDensityErrorWithSign(jpart), 0.1);
+                  double dwk = sph_kernel_derivative(r, h) * kernel_fac;
+                  delta[0][ipart] +=
+                      -1.0e-5 * step * p2(h) * (PI_i + PI_j) / SphP[jpart].Rho * dwk * d[0] / r;
+                  delta[1][ipart] +=
+                      -1.0e-5 * step * p2(h) * (PI_i + PI_j) / SphP[jpart].Rho * dwk * d[1] / r;
 #ifndef TWO_DIM
-                delta[2][ipart] += step * h * wk * d[2] / r;
+                  delta[2][ipart] +=
+                      -1.0e-5 * step * p2(h) * (PI_i + PI_j) / SphP[jpart].Rho * dwk * d[2] / r;
+                } else {
+#endif
+#endif
+                    float wk = sph_kernel ( r, h ) * kernel_fac;
+
+                    delta[0][ipart] += step * h * wk * d[0] / r;
+                    delta[1][ipart] += step * h * wk * d[1] / r;
+#ifndef TWO_DIM
+                    delta[2][ipart] += step * h * wk * d[2] / r;
+#endif
+#ifdef USE_APM
+                }
 #endif
             }
 
