@@ -1,10 +1,16 @@
 #include "../globals.h"
 
+/* Keplerian disk IC by Hopkins (2015) 
+ * This problem requires an external gravitational potential of
+ * phi = -(r^2 + e^2)^(-1/2),
+ * where e = 0.25 is a softening length.
+ */
+
 void setup_Keplerian_Ring ()
 {
     Problem.Boxsize[0] = 4.0;
     Problem.Boxsize[1] = 4.0;
-    Problem.Boxsize[2] = 0.4;
+    Problem.Boxsize[2] = 0.4; /* two-dimentional problem */
 
     sprintf ( Problem.Name, "IC_KeplerianRing" );
 
@@ -26,7 +32,7 @@ float Keplerian_Ring_Density ( const int ipart , const double bias )
     const double Radius = sqrt ( x * x + y * y );
 
     if ( Radius < 0.5 ) {
-        return 0.01 + Radius / 0.5 / 0.5 / 0.5;
+        return 0.01 + pow(Radius / 0.5, 3);
     } else if ( Radius >= 0.5 && Radius <= 2.0 ) {
         return 0.01 + 1;
     } else {
@@ -48,12 +54,14 @@ float Keplerian_Ring_U ( const int ipart )
 
 void Keplerian_Ring_Velocity ( const int ipart, double out[3] )
 {
+    const double x = P[ipart].Pos[0] - Problem.Boxsize[0] * 0.5;
+    const double y = P[ipart].Pos[1] - Problem.Boxsize[1] * 0.5;
+    const double Radius = sqrt ( x * x + y * y );
+    const double epsilon = 0.25;
+    double Vc = Radius * pow(Radius * Radius + epsilon * epsilon, -3.0/4.0);
 
-    out[0] = 0.0;
-    out[1] = 0.0;
+    out[0] = -y / Radius * Vc;
+    out[1] =  x / Radius * Vc;
     out[2] = 0.0;
 
 }
-
-/* Just a note at the end, the gresho vortex is in general a twodimensional testcase. We set it up in three dimesnions, because in a common simulation we
-will only use three dimensions. So you can check the third dimension, but if your code works proper it should remain zero everywhere */

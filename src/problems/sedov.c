@@ -20,9 +20,9 @@ const float  Supernova_Energy = 1.0e51 / (Unit_Mass_in_g * Unit_Velocity_in_cms 
 
 void setup_Sedov_Blast()
 {
-    Problem.Boxsize[0] = 0.1;//3;
-    Problem.Boxsize[1] = 0.1;//3;
-    Problem.Boxsize[2] = 0.1;//3;
+    Problem.Boxsize[0] = 0.2;//3;
+    Problem.Boxsize[1] = 0.2;//3;
+    Problem.Boxsize[2] = 0.2;//3;
 
     sprintf ( Problem.Name, "IC_SedovBlast_000" );
 

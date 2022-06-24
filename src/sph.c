@@ -146,6 +146,7 @@ extern bool Find_hsml ( const int ipart, const int *ngblist, const int ngbcnt,
         }
 
         if ( it > 128 ) { // not enough neighbours ? -> hard exit
+            printf("\n\nWARNING. neighbor search did not converge.\n\n");
             break;
         }
 

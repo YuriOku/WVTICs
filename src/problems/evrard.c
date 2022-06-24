@@ -6,9 +6,11 @@ void setup_Evrard_Collapse()
     Problem.Boxsize[1] = 10.0;
     Problem.Boxsize[2] = 10.0;
 
-    sprintf ( Problem.Name, "IC_Evrard_Collapse" );
+    // Problem.Periodic[0] = Problem.Periodic[1] = Problem.Periodic[2] = false;
 
-    Problem.Rho_Max = 10; // This value is empiric
+    sprintf ( Problem.Name, "IC_Evrard_Collapse_000" );
+
+    Problem.Rho_Max = 20; // This value is empiric
 
     Density_Func_Ptr = &Evrard_Collapse_Density;
     U_Func_Ptr = &Evrard_Collapse_U;
@@ -25,14 +27,13 @@ float Evrard_Collapse_Density ( const int ipart , const double bias )
     double const z = P[ipart].Pos[2] - Problem.Boxsize[2] * 0.5;
 
     double Radius = sqrt ( x * x + y * y + z * z );
-    double epsilon = 0.01;
+    double epsilon = 0.01; // minor factor to avoid zero-division.
 
     if ( Radius < 1 ) {
         return 1.0 / ( 2 * pi * ( Radius + epsilon ) );
     } else {
         return 0.001;
     }
-
 }
 
 void Evrard_Collapse_Velocity ( const int ipart, double out[3] )

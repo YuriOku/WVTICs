@@ -3,8 +3,8 @@
 void setup_Blob()
 {
     Problem.Boxsize[0] = 8000.0;
-    Problem.Boxsize[1] = 2000.0;
-    Problem.Boxsize[2] = 2000.0;
+    Problem.Boxsize[1] = 8000.0;
+    Problem.Boxsize[2] = 8000.0;
 
     sprintf ( Problem.Name, "IC_Blob" );
 

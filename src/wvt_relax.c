@@ -93,6 +93,14 @@ void Regularise_sph_particles()
             redistributeParticles ( movePart, maxProbes );
             Find_sph_quantities();
         }
+        
+#ifdef REGULARIZE
+        if ( it <= Param.LastMoveStep && it % Param.RedistributionFrequency == 0 ) {
+            printf("Begin regularization\n");
+            #include "regularize.h"
+            printf("Done regularization with %d iterations\n", iter);
+        }
+#endif
 
         double errMin = DBL_MAX, errMax = 0, errMean = 0, errSigma = 0.;
 
@@ -202,20 +210,20 @@ void Regularise_sph_particles()
                 double kernel_fac = p3 ( h );
 #endif
 #ifdef USE_APM
-                if (it <= Param.LastMoveStep) {
+                // if (it <= Param.LastMoveStep) {
                   double PI_i = max(1.0 + 0.1*relativeDensityErrorWithSign(ipart), 0.1);
                   double PI_j = max(1.0 + 0.1*relativeDensityErrorWithSign(jpart), 0.1);
                   double dwk = sph_kernel_derivative(r, h) * kernel_fac;
                   delta[0][ipart] +=
-                      -1.0e-5 * step * p2(h) * (PI_i + PI_j) / SphP[jpart].Rho * dwk * d[0] / r;
+                    step * p2(h) * (PI_i + PI_j) / SphP[jpart].Rho * dwk * d[0] / r;
                   delta[1][ipart] +=
-                      -1.0e-5 * step * p2(h) * (PI_i + PI_j) / SphP[jpart].Rho * dwk * d[1] / r;
+                    step * p2(h) * (PI_i + PI_j) / SphP[jpart].Rho * dwk * d[1] / r;
 #ifndef TWO_DIM
                   delta[2][ipart] +=
-                      -1.0e-5 * step * p2(h) * (PI_i + PI_j) / SphP[jpart].Rho * dwk * d[2] / r;
-                } else {
+                    step * p2(h) * (PI_i + PI_j) / SphP[jpart].Rho * dwk * d[2] / r;
+                // } else {
 #endif
-#endif
+#else
                     float wk = sph_kernel ( r, h ) * kernel_fac;
 
                     delta[0][ipart] += step * h * wk * d[0] / r;
@@ -223,8 +231,6 @@ void Regularise_sph_particles()
 #ifndef TWO_DIM
                     delta[2][ipart] += step * h * wk * d[2] / r;
 #endif
-#ifdef USE_APM
-                }
 #endif
             }
 

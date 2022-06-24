@@ -97,6 +97,9 @@ int Find_ngb_tree ( const int ipart, const float hsml, int ngblist[NGBMAX] )
                     }
 
                     if ( ngbcnt == NGBMAX ) {
+                        
+            printf("\n\nWARNING, ngbcnt == %d, increase NGBMAX !\n\n",
+                 ngbcnt);
                         return ngbcnt;
                     }
                 }
@@ -388,8 +391,8 @@ int Find_ngb_simple ( const int ipart, const float hsml, int ngblist[NGBMAX] )
 
         if ( ngbcnt == NGBMAX ) {
 
-            //printf("WARNING, ngbcnt == %d, increase NGBMAX ! ",
-            //      ngbcnt);
+            printf("WARNING, ngbcnt == %d, increase NGBMAX ! ",
+                 ngbcnt);
 
             break;
         }

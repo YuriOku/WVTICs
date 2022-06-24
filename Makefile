@@ -10,6 +10,7 @@ OPT     += -DREJECTION_SAMPLING      # use von Neumann rejection sampling to imp
 OPT     += -DTWO_DIM               # 2D instead of 3D -> set z component to 0
 #OPT     += -DBRUTE_FORCE_NGB               # Use a brute force neighbour finder instead of the tree based one
 #OPT     += -DUSE_APM               # (experimental) Use artificial pressure method (Rosswog 2020)
+OPT     += -DREGULARIZE             # regularize particle distribution in a similar way with Gaburov & Nitadori (2011)
 OPT     += -DOUTPUT_DIAGNOSTICS     # Output extra diagnostics to file
 OPT     += -DGADGET2_OUTPUT_ORDER
 
@@ -19,7 +20,7 @@ ifndef SYSTYPE
 endif
 
 CC       = icc
-OPTIMIZE = -Wall -fast
+OPTIMIZE = -Wall -O3 -xHost
 GSL_INCL = -I/home/yuri/local/include
 GSL_LIBS = -L/home/yuri/local/lib
 PNG_LIBS = -L/usr/local/Cellar/libpng/1.6.21/lib -lpng -lz

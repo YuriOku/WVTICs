@@ -4,7 +4,7 @@ void setup_Box()
 {
     Problem.Boxsize[0] = 1.0;
     Problem.Boxsize[1] = 1.0;
-    Problem.Boxsize[2] = 0.1;
+    Problem.Boxsize[2] = 0.1; /* two-dimentional problem */
 
     sprintf ( Problem.Name, "IC_Box" );
 
@@ -43,9 +43,12 @@ float Box_Density ( const int ipart , const double bias )
 
 void Box_Velocity ( const int ipart, double out[3] )
 {
-    out[0] = 142.3;
-    out[1] = -31.3;
+    out[0] = 0.0;
+    out[1] = 0.0;
     out[2] = 0.0;
+    // out[0] = 142.3;
+    // out[1] = -31.3;
+    // out[2] = 0.0;
 }
 
 /* We set up the internal energy via the pressure profile and ideal equation of state */
