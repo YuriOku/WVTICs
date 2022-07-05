@@ -8,21 +8,21 @@
 // Ref:   Hu et al. (2014)
 
 #ifndef TWO_DIM
-    int NNpart = 1; //64;
+    int NNpart = 64;
 #else
     int NNpart = 16;
 #endif
 const float Unit_Mass_in_g = 1.989e33;
 const float Unit_Velocity_in_cms = 1.0e5;
 
-const float  Supernova_Energy = 1.0e51 / (Unit_Mass_in_g * Unit_Velocity_in_cms * Unit_Velocity_in_cms); // Total injection energy 
-// const float  Supernova_Energy = 6.78e53 / (Unit_Mass_in_g * Unit_Velocity_in_cms * Unit_Velocity_in_cms); // Total injection energy 
+// const float  Supernova_Energy = 1.0e51 / (Unit_Mass_in_g * Unit_Velocity_in_cms * Unit_Velocity_in_cms); // Total injection energy 
+const float  Supernova_Energy = 6.78e53 / (Unit_Mass_in_g * Unit_Velocity_in_cms * Unit_Velocity_in_cms); // Total injection energy 
 
 void setup_Sedov_Blast()
 {
-    Problem.Boxsize[0] = 0.2;//3;
-    Problem.Boxsize[1] = 0.2;//3;
-    Problem.Boxsize[2] = 0.2;//3;
+    Problem.Boxsize[0] = 3;
+    Problem.Boxsize[1] = 3;
+    Problem.Boxsize[2] = 3;
 
     sprintf ( Problem.Name, "IC_SedovBlast_000" );
 
