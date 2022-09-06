@@ -1,19 +1,25 @@
 SHELL = /bin/bash
 
 ## OPTIONS  ##
-#OPT     += -DSAVE_WVT_STEPS         # write IC file for every WVT step
-#OPT     += -DSPH_CUBIC_SPLINE      # for use with Gadget2
-#OPT     += -DSPH_WC2               #wendland c2 kernel
-OPT     += -DREJECTION_SAMPLING      # use von Neumann rejection sampling to improve initial random positions
-#OPT     += -DPEANO_SAMPLING      # use peano curve based sampling to improve initial random positions
-#OPT     += -DEAT_PNG                 # Eat density profile from a png file
-#OPT     += -DTWO_DIM               # 2D instead of 3D -> set z component to 0
-#OPT     += -DBRUTE_FORCE_NGB               # Use a brute force neighbour finder instead of the tree based one
-#OPT     += -DUSE_APM               # (experimental) Use artificial pressure method (Rosswog 2020)
-OPT     += -DREGULARIZE             # regularize particle distribution in a similar way with Gaburov & Nitadori (2011)
+# always recommended
 OPT     += -DOUTPUT_DIAGNOSTICS     # Output extra diagnostics to file
 OPT     += -DGADGET2_OUTPUT_ORDER
 
+# need for 2D
+#OPT     += -DTWO_DIM               # 2D instead of 3D -> set z component to 0
+
+# not needed
+#OPT     += -DSAVE_WVT_STEPS         # write IC file for every WVT step
+#OPT     += -DSPH_CUBIC_SPLINE      # for use with Gadget2
+#OPT     += -DSPH_WC2               # wendland c2 kernel
+#OPT     += -DEAT_PNG                 # Eat density profile from a png file
+#OPT     += -DPEANO_SAMPLING      # use peano curve based sampling to improve initial random positions
+#OPT     += -DBRUTE_FORCE_NGB               # Use a brute force neighbour finder instead of the tree based one
+#OPT     += -DUSE_APM               # (experimental) Use artificial pressure method (Rosswog 2020)
+
+# not recommended
+#OPT     += -DREJECTION_SAMPLING      # use von Neumann rejection sampling to improve initial random positions
+#OPT     += -DREGULARIZE             # regularize particle distribution in a similar way with Gaburov & Nitadori (2011)
 
 ifndef SYSTYPE
     SYSTYPE := $(shell hostname)

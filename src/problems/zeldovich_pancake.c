@@ -1,74 +1,77 @@
 #include "../globals.h"
 
-void setup_Zeldovich_Pancake()
-{
-    Problem.Boxsize[0] = 64.0;
-    Problem.Boxsize[1] = 64.0;
-    Problem.Boxsize[2] = 64.0;
+/* PARAMETERS */
+const double BoxSize = 64;  // size of the simulation box in unit length
+const double zinit = 99;          // redshift of the initial condition
+const double zcoll = 1;           // redshift of collapse
 
-    sprintf ( Problem.Name, "IC_Zeldovich_Pancake" );
+/* UNITS */
+const double UnitLength_in_cm = 3.085678e24;  // Mpc
+const double UnitMass_in_g = 1.989e43;        // 1e10 Msun
+const double UnitVelocity_in_cm_per_s = 1e5;  // km/s
 
-    const double Hubble = 67.74; // Planck 2015 value
-    const double G =  6.67259e-8;
-    const double rho = 3 * Hubble * Hubble / 8 / pi / G; // Critical density of the Universe
+/* CONSTANTS */
+const double GRAVITY = 6.6738e-8;     // gravitational constant in cgs
+const double HUBBLE = 3.2407789e-18;  // 100 km/s/Mpc in 1/s
 
-    Problem.Rho_Max = rho;
+const double UnitDensity_in_cgs =
+    UnitMass_in_g / (UnitLength_in_cm * UnitLength_in_cm * UnitLength_in_cm);
+const double UnitTime_in_s = UnitLength_in_cm / UnitVelocity_in_cm_per_s;
 
-    Density_Func_Ptr = &Zeldovich_Pancake_Density;
-    U_Func_Ptr = &Zeldovich_Pancake_U;
-    Velocity_Func_Ptr = &Zeldovich_Pancake_Velocity;
+// critical density in unit density (independent of hubble parameter)
+const double rhocrit =
+    3 * HUBBLE * HUBBLE / 8 / pi / GRAVITY / UnitDensity_in_cgs;
 
+void setup_Zeldovich_Pancake() {
+  Problem.Boxsize[0] = BoxSize;
+  Problem.Boxsize[1] = BoxSize;
+  Problem.Boxsize[2] = BoxSize;
+
+  sprintf(Problem.Name, "IC_Zeldovich_Pancake");
+
+  Problem.Rho_Max = rhocrit * 1.1;
+
+  Density_Func_Ptr = &Zeldovich_Pancake_Density;
+  U_Func_Ptr = &Zeldovich_Pancake_U;
+  Velocity_Func_Ptr = &Zeldovich_Pancake_Velocity;
+  PostProcessing_Func_Ptr = &Zeldovich_Pancake_PostProcessing;
 }
 
-float q_of_x ( const int ipart )
-{
-
-    return 0.0120544 + 0.999977 * P[ipart].Pos[0];
+float Zeldovich_Pancake_Density(const int ipart, const double bias) {
+  /* At first we set up a constant density in the Box */
+  return rhocrit;
 }
 
-/* At first we set up a constant density in the Box */
-float Zeldovich_Pancake_Density ( const int ipart , const double bias )
-{
-    const double redshift_start = 100.0;
-    const double redshift_crit = 1.0;
-    const double Hubble = 67.74;
-    const double G = 6.67259e-8;
-    const double rho = 3 * Hubble * Hubble / 8 / pi / G;
-    const double  k = 2 * pi / Problem.Boxsize[0];
-
-    return rho / ( 1 - ( 1 + redshift_crit ) / ( 1 + redshift_start ) * cos ( k * q_of_x ( ipart ) ) );
+void Zeldovich_Pancake_Velocity(const int ipart, double out[3]) {
+  out[0] = 0.0;
+  out[1] = 0.0;
+  out[2] = 0.0;
 }
 
-void Zeldovich_Pancake_Velocity ( const int ipart, double out[3] )
-{
-    const double redshift_start = 100.0;
-    const double redshift_crit = 1.0;
-    const double Hubble = 67.74;
-    const double k = 2 * pi / Problem.Boxsize[0];
-
-    out[0] = - Hubble * ( 1 + redshift_crit ) / sqrt ( 1 + redshift_start ) * sin ( k * q_of_x ( ipart ) ) / k;
-    out[1] = 0.0;
-    out[2] = 0.0;
+float Zeldovich_Pancake_U(const int ipart) {
+  /* internal energy will be set by InitGasTemp */
+  return 0.0;
 }
 
-/* We set up the internal energy via the pressure profile and ideal equation of state */
+void Zeldovich_Pancake_PostProcessing() {
+  /* Fourier mode of boxsize */
+  double k = 2 * pi / BoxSize;
 
-float Zeldovich_Pancake_U ( const int ipart )
-{
-    const double redshift_start = 100.0;
-    const double redshift_crit = 1.0;
-    const double Hubble = 67.74;
-    const double G = 6.67259e-8;
-    const double gamma = 5. / 3.;
-    const double rho = 3 * Hubble * Hubble / 8 / pi / G;
-    const double temp_zero = 1.0;
-    const double kboltzmann = 1.380658e-16;
-    const double yhelium = ( 1 - 0.76 ) / ( 4 * 0.76 );
-    const double mean_mol_weight = ( 1 + 4 * yhelium ) / ( 1 + 3 * yhelium + 1 );
-    const double v_unit = 1e5;
-    const double prtn = 1.672623e-24;
-    const double u_fac = kboltzmann  / ( ( gamma - 1 ) * v_unit * v_unit * prtn * mean_mol_weight );
+  /* collapse at x = Lbox/2.
+   * note that this set up is independent of the Hubble parameter due to h in length units. */
 
-    return u_fac * temp_zero * pow ( redshift_start / redshift_crit, 2 ) * pow ( SphP[ipart].Rho / rho, 2. / 3. );
+  /* compute velocity before displacement */
+  for (int i = 0; i < Param.Npart; i++) {
+    P[i].Vel[0] =
+        100.0 * (1 + zcoll) / sqrt(1 + zinit) * sin(k * P[i].Pos[0]) / k;
 
+    /* convert to gadget's velocity */
+    double ainit = 1 / (1 + zinit);
+    P[i].Vel[0] /= sqrt(ainit);
+  }
+
+  /* displace particle using Zeldovich approximation */
+  for (int i = 0; i < Param.Npart; i++) {
+    P[i].Pos[0] += (1 + zcoll) / (1 + zinit) * sin(k * P[i].Pos[0]) / k;
+  }
 }

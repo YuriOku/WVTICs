@@ -63,6 +63,7 @@ float q_of_x ( const int ipart );
 float Zeldovich_Pancake_Density ( const int ipart , const double bias );
 void Zeldovich_Pancake_Velocity ( const int ipart, double out[3] );
 float Zeldovich_Pancake_U ( const int ipart );
+void Zeldovich_Pancake_PostProcessing();
 
 void setup_Box();
 bool isInnerBox ( const int ipart );
